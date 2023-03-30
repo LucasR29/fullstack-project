@@ -36,7 +36,6 @@ import { GetServerSideProps, NextPage } from "next"
 import { useRouter } from "next/router"
 import { useState } from "react"
 import { useForm } from "react-hook-form"
-import { StringifyOptions } from "querystring"
 
 
 interface Props {
@@ -63,7 +62,20 @@ const Clients: NextPage<Props> = ({ clients }) => {
         setIsClient(false)
         onClose()
         setIsEdit(false)
+        handleScrollPosition()
     }
+
+    const handleScrollPosition = () => {
+        const scrollPosition = sessionStorage.getItem("scrollPosition");
+        if (scrollPosition) {
+            window.scrollTo(0, parseInt(scrollPosition));
+            sessionStorage.removeItem("scrollPosition");
+        }
+    };
+
+    const handleClick = () => {
+        sessionStorage.setItem("scrollPosition", String(window.pageXOffset));
+    };
 
     const showToast = (message: string, color: string) => {
         return (toast({
@@ -116,10 +128,6 @@ const Clients: NextPage<Props> = ({ clients }) => {
         resetRefresh()
     }
 
-    const handleEdit = (id: string, route: string) => {
-
-    }
-
     return (
         <>
             <Modal isOpen={isOpen} onClose={onClose} closeOnOverlayClick={false}>
@@ -155,7 +163,7 @@ const Clients: NextPage<Props> = ({ clients }) => {
                         </ModalBody>
 
                         <ModalFooter justifyContent={"center"}>
-                            <Button type="submit" colorScheme='blue' mr={3}>
+                            <Button type="submit" colorScheme='blue' mr={3} onClick={handleClick}>
                                 Send
                             </Button>
                         </ModalFooter>
