@@ -66,6 +66,7 @@ const Clients: NextPage<Props> = ({ clients }) => {
         ) : (
             api.post(`/contacts/${userID}`, data)
         )
+
         resetRefresh()
     }
 
