@@ -6,7 +6,7 @@ import { app } from "./app";
         console.log("Error during Data Source initialization", err)
     })
 
-    app.listen(3000, () => {
-        console.log("Sevidor executando")
+    app.listen(3001, () => {
+        console.log("Server running on port 3001")
     })
 })()
