@@ -31,11 +31,12 @@ import {
     useToast
 } from "@chakra-ui/react"
 
-import { MinusIcon, AddIcon } from "@chakra-ui/icons"
+import { MinusIcon, AddIcon, DeleteIcon, EditIcon } from "@chakra-ui/icons"
 import { GetServerSideProps, NextPage } from "next"
 import { useRouter } from "next/router"
 import { useState } from "react"
 import { useForm } from "react-hook-form"
+import { StringifyOptions } from "querystring"
 
 
 interface Props {
@@ -49,6 +50,7 @@ const Clients: NextPage<Props> = ({ clients }) => {
     const { isOpen, onOpen, onClose } = useDisclosure()
     const [isClient, setIsClient] = useState(false)
     const [userID, setUserID] = useState('')
+    const [isEdit, setIsEdit] = useState(false)
     const { register, handleSubmit, reset, formState: { errors } } = useForm()
 
     const refreshData = () => {
@@ -77,20 +79,44 @@ const Clients: NextPage<Props> = ({ clients }) => {
 
     const onSubmit = (data: any) => {
         isClient ? (
-            api.post('/clients', data)
-                .catch(function (error) {
-                    showToast(error.response.data.message, "red.500")
-                    console.log(error)
-                })
+            isEdit ? (
+                api.patch(`/clients/${userID}`, data)
+                    .catch(function (error) {
+                        showToast(error.response.data.message, "red.500")
+                        console.log(error)
+                    })
+            ) : (
+                api.post('/clients', data)
+                    .catch(function (error) {
+                        showToast(error.response.data.message, "red.500")
+                        console.log(error)
+                    })
+            )
         ) : (
-            api.post(`/contacts/${userID}`, data)
-                .catch(function (error) {
-                    showToast(error.response.data.message, "red.500")
-                    console.log(error)
-                })
+            isEdit ? (
+                api.patch(`/contacts/${userID}`, data)
+                    .catch(function (error) {
+                        showToast(error.response.data.message, "red.500")
+                        console.log(error)
+                    })
+            ) : (
+                api.post(`/contacts/${userID}`, data)
+                    .catch(function (error) {
+                        showToast(error.response.data.message, "red.500")
+                        console.log(error)
+                    })
+            )
         )
-
         resetRefresh()
+    }
+
+    const handleDelete = (id: string, route: string) => {
+        api.delete(`/${route}/${id}`)
+        resetRefresh()
+    }
+
+    const handleEdit = (id: string, route: string) => {
+
     }
 
     return (
@@ -145,9 +171,16 @@ const Clients: NextPage<Props> = ({ clients }) => {
                         return (
                             <Card>
                                 <CardHeader>
-                                    <Heading>
-                                        {client.full_name}
-                                    </Heading>
+                                    <Flex justifyContent={"space-between"} alignItems={'center'}>
+
+                                        <Heading >
+                                            {client.full_name}
+                                        </Heading>
+                                        <Box>
+                                            <Button id={client.id} onClick={e => { onOpen(), setIsClient(true), setIsEdit(true), setUserID(e.currentTarget.id) }} h={7} w={5} backgroundColor={"gray.500"} textAlign='center'><EditIcon /></Button>
+                                            <Button id={client.id} onClick={e => { handleDelete(e.currentTarget.id, 'clients') }} h={7} w={5} marginLeft={2} backgroundColor={"red.500"} textAlign='center'><DeleteIcon /></Button>
+                                        </Box>
+                                    </Flex>
                                 </CardHeader>
                                 <CardBody>
                                     <Stack divider={<StackDivider />} spacing='4'>
@@ -197,6 +230,10 @@ const Clients: NextPage<Props> = ({ clients }) => {
                                                                                             <Box>Email: {contact.email}</Box>
                                                                                             <Box>Phone Number: {contact.phone_number}</Box>
                                                                                             <Box>Created At: {contact.createdAt}</Box>
+                                                                                            <Box>
+                                                                                                <Button id={contact.id} onClick={e => { onOpen(), setIsClient(false), setIsEdit(true), setUserID(e.currentTarget.id) }} h={7} w={5} backgroundColor={"gray.500"} textAlign='center'><EditIcon /></Button>
+                                                                                                <Button id={contact.id} onClick={e => { handleDelete(e.currentTarget.id, 'contacts') }} h={7} w={5} marginLeft={2} backgroundColor={"red.500"} textAlign='center'><DeleteIcon /></Button>
+                                                                                            </Box>
                                                                                         </Stack>
                                                                                     </AccordionPanel>
                                                                                 </>
