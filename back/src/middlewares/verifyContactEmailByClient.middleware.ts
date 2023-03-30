@@ -22,7 +22,7 @@ export const verifyContactEmailMiddleware = () => async (req: Request, res: Resp
     })
 
     if (findContact) {
-        return res.status(409).json({ "message": "Contact email alredy registred for this user" })
+        return res.status(409).json({ "message": "Contact email already registred for this user" })
     }
 
 

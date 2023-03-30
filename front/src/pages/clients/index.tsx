@@ -27,7 +27,8 @@ import {
     FormControl,
     FormLabel,
     Flex,
-    Text
+    Text,
+    useToast
 } from "@chakra-ui/react"
 
 import { MinusIcon, AddIcon } from "@chakra-ui/icons"
@@ -43,6 +44,7 @@ interface Props {
 
 const Clients: NextPage<Props> = ({ clients }) => {
     const router = useRouter()
+    const toast = useToast()
 
     const { isOpen, onOpen, onClose } = useDisclosure()
     const [isClient, setIsClient] = useState(false)
@@ -60,11 +62,32 @@ const Clients: NextPage<Props> = ({ clients }) => {
         onClose()
     }
 
+    const showToast = (message: string, color: string) => {
+        return (toast({
+            position: "bottom-right",
+            render: () => {
+                return (
+                    <Box color={"black"} p={6} bg={color} borderRadius={10} fontSize={15}>
+                        {message}
+                    </Box>
+                )
+            }
+        }))
+    }
+
     const onSubmit = (data: any) => {
         isClient ? (
             api.post('/clients', data)
+                .catch(function (error) {
+                    showToast(error.response.data.message, "red.500")
+                    console.log(error)
+                })
         ) : (
             api.post(`/contacts/${userID}`, data)
+                .catch(function (error) {
+                    showToast(error.response.data.message, "red.500")
+                    console.log(error)
+                })
         )
 
         resetRefresh()
