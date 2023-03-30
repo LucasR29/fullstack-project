@@ -62,6 +62,7 @@ const Clients: NextPage<Props> = ({ clients }) => {
         refreshData()
         setIsClient(false)
         onClose()
+        setIsEdit(false)
     }
 
     const showToast = (message: string, color: string) => {

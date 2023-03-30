@@ -8,7 +8,7 @@ export const verifyContactEmailMiddleware = () => async (req: Request, res: Resp
     const clientRepository = AppDataSource.getRepository(Client)
     const contactRepository = AppDataSource.getRepository(Contact)
 
-    const findClient = await clientRepository.findOneByOrFail({ email: req.body.email })
+    const findClient = await clientRepository.findOneBy({ id: req.params.id })
 
     if (!findClient) {
         return res.status(409).json({ "message": "Client does not exists" })
