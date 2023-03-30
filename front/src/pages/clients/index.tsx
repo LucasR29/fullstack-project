@@ -112,7 +112,7 @@ const Clients: NextPage<Props> = ({ clients }) => {
                 </form>
             </Modal>
             <Flex margin={10} justifyContent={"space-between"} alignItems={"center"}>
-                <Text fontSize={22} fontWeight={500}>Clients List</Text>
+                <Text fontSize={30} fontWeight={500}>Clients List</Text>
                 <Button backgroundColor={"green.500"} color={"black"} onClick={event => (setIsClient(true), onOpen())}>Add Client</Button>
             </Flex>
             <SimpleGrid spacing={10} margin={10}>
