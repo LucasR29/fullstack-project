@@ -18,7 +18,7 @@ FRONT:
 STYLES:
 - [Chakra UI](https://chakra-ui.com)
 
----
+------
 
 ## 2. Running Project:
 To run this project you need to open 2 terminals on you IDE, one for the BACK forder and one for the FRONT folder
