@@ -96,7 +96,7 @@ Styling made based on dark mode, light or system mode can turn things ugly
 
 
 ### 3. Dependencies Already installed:
-If you are runnig this for the second time and already have both folders dependencies intalled run both of this commands on shell of the main folder
+If you are runnig this for the second time and already have both folders dependencies intalled run both of this commands on shell in the main folder
 
 ```
 yarn --cwd ./front run dev
