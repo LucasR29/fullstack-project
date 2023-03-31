@@ -21,7 +21,7 @@ STYLES:
 ------
 
 ## 2. Running Project:
-To run this project you need to open 2 terminals on you IDE, one for the BACK forder and one for the FRONT folder
+To run this project you need to open 2 terminals on your IDE, one for the BACK forder and one for the FRONT folder
 
 If you preffer you could also open each folder separately
 
