@@ -18,17 +18,14 @@ FRONT:
 STYLES:
 - [Chakra UI](https://chakra-ui.com)
 
-
-
-
+---
 
 ## 2. Running Project:
 To run this project you need to open 2 terminals on you IDE, one for the BACK forder and one for the FRONT folder
 
 If you preffer you could also open each folder separately
 
-
-
+---
 
 ### 2.1. RUN BACK:
 
@@ -39,7 +36,7 @@ use only one through all project
 yarn or npm 
 ```
 
-
+---
 
 #### Environment Variables:
 
@@ -47,7 +44,7 @@ PostgreSQL: Create a .env file, copping .env.example and put your credencials on
 
 SQLite3: Create a .env file, copping .env.example and put anything on URL and put <'test'> on NODE_ENV
 
-
+---
 
 #### Run Migrations (on postgres use):
 
@@ -55,7 +52,7 @@ SQLite3: Create a .env file, copping .env.example and put anything on URL and pu
 yarn typeorm migration:run -d src/data-source.ts
 ```
 
-
+---
 
 #### Run Server:
 Server will run on port 3001 by default it can be changed on server.ts file
@@ -66,12 +63,11 @@ If you do remember to change services/api.ts file on FRONT folder
 yarn dev
 ```
  
- 
- 
+---
  
 ### 2.2. RUN FRONT:
 
-
+---
 
 #### Install Dependencies
 use only one through all project
@@ -79,7 +75,7 @@ use only one through all project
 yarn or npm
 ```
 
-
+---
 
 #### Run App:
 App will run on port 3000
@@ -88,7 +84,7 @@ App will run on port 3000
 yarn dev
 ```
 
-
+---
 
 #### Color mode:
 FRONT color mode set to dark mode, if you are crazy and want light mode just change the initialColorMode prop to light or system on theme.ts file
@@ -96,7 +92,7 @@ FRONT color mode set to dark mode, if you are crazy and want light mode just cha
 Styling made based on dark mode, light or system mode can turn things ugly
 
 
-
+---
 
 
 ### 3. Dependencies Already installed:
