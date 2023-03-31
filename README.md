@@ -26,9 +26,10 @@ If you preffer you could also open each folder separately
 ### 2.1. RUN BACK:
 
 #### Install Dependencies
+use only one through all project
 
 ```shell
-yarn or npm (use only one for all commands project)
+yarn or npm 
 ```
 
 #### Environment Variables:
@@ -50,12 +51,12 @@ If you do remember to change services/api.ts file on FRONT folder
 yarn dev
 ```
  
-### 2.2; RUN FRONT:
+### 2.2. RUN FRONT:
 
 #### Install Dependencies
-
+use only one through all project
 ```shell
-yarn or npm (use only one for all commands project)
+yarn or npm
 ```
 
 #### Run App:
