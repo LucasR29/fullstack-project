@@ -1,6 +1,6 @@
 import { AppDataSource } from "../../data-source";
-import Client from "../../entities/clients/client.entity";
-import Contact from "../../entities/contacts/contact";
+import Client from "../../entities/client.entity";
+import Contact from "../../entities/contact";
 
 import { IContactCreationRequest } from "../../interfaces/contacts.interface";
 

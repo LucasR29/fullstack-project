@@ -1,5 +1,5 @@
 import { AppDataSource } from "../../data-source";
-import Client from "../../entities/clients/client.entity";
+import Client from "../../entities/client.entity";
 import { IClientCreationRequest } from "../../interfaces/clients.interface";
 
 export const createClientService = async (clientData: IClientCreationRequest): Promise<IClientCreationRequest> => {

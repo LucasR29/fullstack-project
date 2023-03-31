@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import { AppDataSource } from "../data-source";
-import Client from "../entities/clients/client.entity";
+import Client from "../entities/client.entity";
 
 export const verifyClientEmailMiddleware = () => async (req: Request, res: Response, next: NextFunction) => {
     const clientRepository = AppDataSource.getRepository(Client)

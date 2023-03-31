@@ -2,13 +2,13 @@ import 'dotenv/config'
 import path from "path"
 import 'reflect-metadata'
 import { DataSource, DataSourceOptions } from 'typeorm'
-import Client from './entities/clients/client.entity'
-import Contact from './entities/contacts/contact'
+import Client from './entities/client.entity'
+import Contact from './entities/contact'
 import { InicialMigration1680015625463 } from './migrations/1680015625463-InicialMigration'
 
 const dataSourceConfig = (): DataSourceOptions => {
-    // const entitiesPath: string = path.join(__dirname, './entities/**/**.{ts,js}')
-    // const migrationsPath: string = path.join('./migrations/**.{ts,js}')
+    // const entitiesPath: string = path.join(__dirname, './entities/**.{ts,js}')
+    // const migrationsPath: string = path.join(__dirname, './migrations/**.{ts,js}')
 
     const dbUrl: string | undefined = process.env.DATABASE_URL
 
@@ -16,23 +16,33 @@ const dataSourceConfig = (): DataSourceOptions => {
 
     const nodeEnv: string | undefined = process.env.NODE_ENV
 
-    if (nodeEnv === 'test') {
-        return {
+    let sourceOp: DataSourceOptions = {
+        type: 'sqlite',
+        database: path.join(__dirname, '/sqlite3.db'),
+        synchronize: true,
+        entities: [Client, Contact]
+    }
+
+    nodeEnv === 'test' ? (
+        sourceOp = {
             type: 'sqlite',
-            database: ':memory:',
+            database: path.join(__dirname, '/sqlite3.db'),
             synchronize: true,
             entities: [Client, Contact]
         }
-    }
+    ) : (
+        sourceOp = {
+            type: 'postgres',
+            url: dbUrl,
+            synchronize: false,
+            logging: true,
+            entities: [Client, Contact],
+            migrations: [InicialMigration1680015625463]
+        }
+    )
 
-    return {
-        type: 'postgres',
-        url: dbUrl,
-        synchronize: false,
-        logging: true,
-        entities: [Client, Contact],
-        migrations: [InicialMigration1680015625463]
-    }
+    return sourceOp
+
 }
 
 export const AppDataSource = new DataSource(dataSourceConfig())

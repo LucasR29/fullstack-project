@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import { AppDataSource } from "../data-source";
-import Client from "../entities/clients/client.entity";
-import Contact from "../entities/contacts/contact";
+import Client from "../entities/client.entity";
+import Contact from "../entities/contact";
 
 
 export const verifyContactEmailMiddleware = () => async (req: Request, res: Response, next: NextFunction) => {
