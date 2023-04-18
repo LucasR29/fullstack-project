@@ -1,17 +1,30 @@
+import { hashSync } from "bcryptjs";
 import { AppDataSource } from "../../data-source";
 import Client from "../../entities/client.entity";
-import { IClientCreationRequest } from "../../interfaces/clients.interface";
+import { AppError } from "../../errors/appError";
+import { IClientCreationRequest, IClientCreationResponse } from "../../interfaces/clients.interface";
+import { clientResSchema } from "../../schemas/clientsSchemas/createCliente.schema";
 
-export const createClientService = async (clientData: IClientCreationRequest): Promise<IClientCreationRequest> => {
+export const createClientService = async (clientData: IClientCreationRequest): Promise<IClientCreationResponse> => {
     const clientRepository = AppDataSource.getRepository(Client)
 
+    const exists = await clientRepository.exist({
+        where: { email: clientData.email }
+    })
+
+
+
     const client = clientRepository.create(clientData)
+
+    client.password = hashSync(clientData.password, 10)
 
     const newClient = await clientRepository.save({
         ...client,
     })
 
-    return newClient
+    const userWithoutPassword = await clientResSchema.validate(newClient, { stripUnknown: true })
+
+    return userWithoutPassword
 }
 
 export const retrieveClientService = async (clientID: string): Promise<any> => {

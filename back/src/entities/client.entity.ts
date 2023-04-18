@@ -12,6 +12,9 @@ class Client {
     @Column({ length: 127 })
     email: string
 
+    @Column()
+    password: string
+
     @Column({ length: 12 })
     phone_number: string
 

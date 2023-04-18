@@ -1,5 +1,4 @@
 import api from "@/services/api"
-import { Clients } from "@/types"
 import {
     Card,
     CardHeader,
@@ -34,22 +33,23 @@ import {
 import { MinusIcon, AddIcon, DeleteIcon, EditIcon } from "@chakra-ui/icons"
 import { GetServerSideProps, NextPage } from "next"
 import { useRouter } from "next/router"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { useForm } from "react-hook-form"
+import jwt from 'jsonwebtoken'
 
 
-interface Props {
-    clients: Clients[]
-}
+// interface Props {
+//     clients: Clients[]
+// }
 
-const Clients: NextPage<Props> = ({ clients }) => {
+function Clients() {
     const router = useRouter()
     const toast = useToast()
-
     const { isOpen, onOpen, onClose } = useDisclosure()
     const [isClient, setIsClient] = useState(false)
     const [userID, setUserID] = useState('')
     const [isEdit, setIsEdit] = useState(false)
+    const [contacts, setContacts] = useState<any[]>([])
     const { register, handleSubmit, reset, formState: { errors } } = useForm()
 
     const refreshData = () => {
@@ -90,35 +90,58 @@ const Clients: NextPage<Props> = ({ clients }) => {
         }))
     }
 
+    const getContacts = async () => {
+        const token = localStorage.getItem('userData')
+
+        if (!token) {
+            router.push('/')
+            localStorage.clear()
+        }
+
+        const userData: { id: string } = jwt.decode(token as string) as { id: string }
+
+        if (userData === null) {
+            router.push('/')
+            localStorage.clear()
+        } else {
+            if (userData === undefined || userData.id === undefined || userData.id === null) {
+                router.push('/')
+                localStorage.clear()
+            }
+        }
+
+
+        const contacts: any = await api.get(`/contacts/${userData.id}`).catch((error) => { router.push('/'), localStorage.clear() })
+
+        setUserID(userData.id)
+
+        console.log(contacts.data)
+
+        setContacts(contacts.data)
+    }
+
+    useEffect(() => {
+        getContacts()
+    }, [])
+
+    const disconect = () => {
+        localStorage.clear()
+        router.push('/')
+    }
+
     const onSubmit = (data: any) => {
-        isClient ? (
-            isEdit ? (
-                api.patch(`/clients/${userID}`, data)
-                    .catch(function (error) {
-                        showToast(error.response.data.message, "red.500")
-                        console.log(error)
-                    })
-            ) : (
-                api.post('/clients', data)
-                    .catch(function (error) {
-                        showToast(error.response.data.message, "red.500")
-                        console.log(error)
-                    })
-            )
+        isEdit ? (
+            api.patch(`/contacts/${userID}`, data)
+                .catch(function (error) {
+                    showToast(error.response.data.message, "red.500")
+                })
         ) : (
-            isEdit ? (
-                api.patch(`/contacts/${userID}`, data)
-                    .catch(function (error) {
-                        showToast(error.response.data.message, "red.500")
-                        console.log(error)
-                    })
-            ) : (
-                api.post(`/contacts/${userID}`, data)
-                    .catch(function (error) {
-                        showToast(error.response.data.message, "red.500")
-                        console.log(error)
-                    })
-            )
+            api.post(`/contacts/${userID}`, data)
+                .catch(function (error) {
+                    showToast(error.response.data.message, "red.500")
+                }).then((res: any) => {
+                    setContacts([...contacts, res.data])
+                })
         )
         resetRefresh()
     }
@@ -134,13 +157,7 @@ const Clients: NextPage<Props> = ({ clients }) => {
                 <ModalOverlay />
                 <form onSubmit={handleSubmit(onSubmit)}>
                     <ModalContent>
-                        {
-                            isClient ? (
-                                <ModalHeader>Client Info</ModalHeader>
-                            ) : (
-                                <ModalHeader>Contact Info</ModalHeader>
-                            )
-                        }
+                        <ModalHeader>Contact Info</ModalHeader>
                         <ModalCloseButton onClick={event => { setIsClient(false), reset() }} />
                         <ModalBody>
 
@@ -171,18 +188,21 @@ const Clients: NextPage<Props> = ({ clients }) => {
                 </form>
             </Modal>
             <Flex margin={10} justifyContent={"space-between"} alignItems={"center"}>
-                <Text fontSize={30} fontWeight={500}>Clients List</Text>
-                <Button backgroundColor={"green.500"} color={"black"} onClick={() => { setIsClient(true), onOpen() }}>Add Client</Button>
+                <Text fontSize={30} fontWeight={500}>Contacts List</Text>
+                <Box>
+                    <Button mr={2} onClick={disconect} >Disconect</Button>
+                    <Button backgroundColor={"green.500"} color={"black"} onClick={() => { setIsClient(true), onOpen() }} >Add Client</Button>
+                </Box>
             </Flex>
-            <SimpleGrid spacing={10} margin={10}>
+            <SimpleGrid spacing={10} margin={10} columns={[1, null, 2]}>
                 {
-                    clients.map((client, index) => {
+                    contacts.map((client, index) => {
                         return (
                             <Card>
                                 <CardHeader>
                                     <Flex justifyContent={"space-between"} alignItems={'center'}>
 
-                                        <Heading >
+                                        <Heading fontSize={18} maxWidth={'300px'}>
                                             {client.full_name}
                                         </Heading>
                                         <Box>
@@ -202,64 +222,6 @@ const Clients: NextPage<Props> = ({ clients }) => {
                                         <Box>
                                             Added At: {client.createdAt}
                                         </Box>
-                                        <Box>
-                                            <Accordion allowToggle>
-                                                <AccordionItem border={'none'}>
-                                                    <h2>
-                                                        <AccordionButton backgroundColor={'gray.800'} borderRadius={10}>
-                                                            <Box flex={1} textAlign={'left'}>
-                                                                Contacts
-                                                            </Box>
-                                                            <AccordionIcon />
-                                                        </AccordionButton>
-                                                    </h2>
-                                                    <AccordionPanel>
-                                                        <SimpleGrid>
-                                                            <Accordion allowToggle overflow={"auto"}>
-                                                                {client.contacts.map((contact, index) => {
-                                                                    return (
-                                                                        <AccordionItem marginTop={2} border='none'>
-                                                                            {({ isExpanded }) => (
-                                                                                <>
-                                                                                    <h2>
-                                                                                        <AccordionButton backgroundColor={"gray.600"} borderRadius={10}>
-                                                                                            <Box flex={1} textAlign={"left"}>
-                                                                                                {contact.full_name}
-                                                                                            </Box>
-                                                                                            {isExpanded ? (
-                                                                                                <MinusIcon fontSize='12px' backgroundColor={'red.500'} h={5} w={5} padding={1} borderRadius={5} />
-
-                                                                                            ) : (
-                                                                                                <AddIcon fontSize='12px' backgroundColor={'green.500'} h={5} w={5} padding={1} borderRadius={5} />
-                                                                                            )}
-                                                                                        </AccordionButton>
-                                                                                    </h2>
-                                                                                    <AccordionPanel backgroundColor={"gray.900"} borderRadius={10} margin={2}>
-                                                                                        <Stack divider={<StackDivider />} spacing={2}>
-                                                                                            <Box>Email: {contact.email}</Box>
-                                                                                            <Box>Phone Number: {contact.phone_number}</Box>
-                                                                                            <Box>Created At: {contact.createdAt}</Box>
-                                                                                            <Box>
-                                                                                                <Button id={contact.id} onClick={e => { onOpen(), setIsClient(false), setIsEdit(true), setUserID(e.currentTarget.id) }} h={7} w={5} backgroundColor={"gray.500"} textAlign='center'><EditIcon /></Button>
-                                                                                                <Button id={contact.id} onClick={e => { handleDelete(e.currentTarget.id, 'contacts') }} h={7} w={5} marginLeft={2} backgroundColor={"red.500"} textAlign='center'><DeleteIcon /></Button>
-                                                                                            </Box>
-                                                                                        </Stack>
-                                                                                    </AccordionPanel>
-                                                                                </>
-                                                                            )}
-                                                                        </AccordionItem>
-                                                                    )
-                                                                })}
-
-                                                            </Accordion>
-                                                        </SimpleGrid>
-                                                        <Button id={client.id} marginTop={5} h={7} w={20} fontSize={12} backgroundColor={'green.700'} onClick={event => { setUserID(event.currentTarget.id), onOpen() }}>
-                                                            Add Contact
-                                                        </Button>
-                                                    </AccordionPanel>
-                                                </AccordionItem>
-                                            </Accordion>
-                                        </Box>
                                     </Stack>
                                 </CardBody>
                             </Card>
@@ -273,11 +235,3 @@ const Clients: NextPage<Props> = ({ clients }) => {
 }
 
 export default Clients
-
-
-export const getServerSideProps: GetServerSideProps<Props> = async () => {
-    const response = await api.get("/clients")
-    const clients = response.data
-
-    return { props: { clients } }
-}
