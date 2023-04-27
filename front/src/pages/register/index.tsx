@@ -31,11 +31,9 @@ export default function Register() {
         api.post('/clients', data)
             .catch(function (error) {
                 showToast(error.response.data.message, "red.500")
-                console.log(error)
             })
             .then(res => {
                 if (res !== undefined) {
-                    console.log(res)
                     showToast('User created, redirecting', 'green.500')
                     setTimeout(() => {
                         router.push('/')
@@ -71,7 +69,7 @@ export default function Register() {
                         <Input backgroundColor={'gray.400'} mt={1} mb={5} placeholder='(99)999-999-999' color={'black'} _placeholder={{ color: 'gray.600' }} id="tel" type="number" {...register("phone_number", { required: true, minLength: 9, maxLength: 15 })} />
                     </FormControl>
                     <Flex w={'100%'} alignItems={'center'} justifyContent={'center'}>
-                        <Button type='submit' w={'150px'} h={'40px'} mr={5} backgroundColor={'green.700'} _hover={{ bgColor: 'green.400' }}>Logar</Button>
+                        <Button type='submit' w={'150px'} h={'40px'} mr={5} backgroundColor={'green.700'} _hover={{ bgColor: 'green.400' }}>Cadastrar</Button>
                         <Button onClick={handleClick}>Login</Button>
                     </Flex>
                 </form>

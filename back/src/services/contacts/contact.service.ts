@@ -2,7 +2,7 @@ import { AppDataSource } from "../../data-source";
 import Client from "../../entities/client.entity";
 import Contact from "../../entities/contact";
 
-import { IContactCreationRequest } from "../../interfaces/contacts.interface";
+import { IContactCreationRequest, IContactEdit } from "../../interfaces/contacts.interface";
 
 export const createContactService = async (contactData: IContactCreationRequest, clientID: string): Promise<IContactCreationRequest> => {
     const contactRepository = AppDataSource.getRepository(Contact)
@@ -43,7 +43,7 @@ export const retrieveContactService = async (contactID: string): Promise<any> =>
     return [200, contacts]
 }
 
-export const updateContactService = async (contactData: IContactCreationRequest, contactID: string): Promise<any> => {
+export const updateContactService = async (contactData: IContactEdit, contactID: string): Promise<any> => {
     const contactRepository = AppDataSource.getRepository(Contact)
 
     const contact = await contactRepository.findOne({
@@ -51,6 +51,26 @@ export const updateContactService = async (contactData: IContactCreationRequest,
             id: contactID
         }
     })
+
+    if (contactData.full_name?.length === 0) {
+        delete contactData['full_name']
+    }
+
+    if (contactData.email?.length === 0) {
+        delete contactData['email']
+    } else {
+        const validate = await contactRepository.findOneBy({
+            email: contactData.email!
+        })
+
+        if (validate) {
+            return [409, { message: "email already in use in this list" }]
+        }
+    }
+
+    if (contactData.phone_number?.length === 0) {
+        delete contactData['phone_number']
+    }
 
     if (!contact) {
         return [404, { message: "contact not found" }]

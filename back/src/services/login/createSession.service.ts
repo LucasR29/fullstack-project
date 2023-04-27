@@ -12,20 +12,26 @@ export const createSessionService = async ({
 }: IUserRequest): Promise<any> => {
     const userRepository = AppDataSource.getRepository(Client)
 
-    const user = await userRepository.findOneByOrFail({
+    const user = await userRepository.findOneBy({
         email: email
     })
+
+    if (!user) {
+        return ['email not found', 404]
+    }
 
     const passwordMatch = await compare(password, user.password)
 
     if (!passwordMatch) {
-        return ['Invalid password', 403]
+        return ['Invalid password', 404]
     }
 
     const token = jwt.sign(
         {
             email: email,
-            id: user.id
+            id: user.id,
+            full_name: user.full_name,
+            phone_number: user.phone_number
         },
         process.env.SECRET_KEY!,
         {

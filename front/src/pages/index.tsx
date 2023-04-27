@@ -7,6 +7,7 @@ import { useRouter } from 'next/router'
 import { useForm } from 'react-hook-form'
 import api from '@/services/api'
 import jwt from 'jsonwebtoken'
+import { AxiosError } from 'axios'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -28,17 +29,14 @@ export default function Home() {
     }))
   }
 
-  const onSubmit = (data: any) => {
-    api.post('/login', data)
-      .then(res => {
-        localStorage.setItem('userData', res.data)
-        router.push('/clients')
-      }
-      )
-      .catch(function (error) {
-        showToast(error.response.data.message, "red.500")
-        console.log(error)
-      })
+  const onSubmit = async (userData: any) => {
+    try {
+      const { data } = await api.post('/login', userData)
+      localStorage.setItem('userData', data)
+      router.push('/clients')
+    } catch (error: any) {
+      showToast(error.response.data, "red.500")
+    }
   }
 
   function handleClick() {
@@ -58,7 +56,7 @@ export default function Home() {
             {errors.password?.type === 'required' && <Text fontSize={10} color={'red.400'}>Password is required</Text>}
             <Input type='password' backgroundColor={'gray.400'} mt={1} mb={5} placeholder='Password' color={'black'} _placeholder={{ color: 'gray.600' }} {...register('password', { required: true })} />
             <Flex w={'100%'} alignItems={'center'} justifyContent={'center'}>
-              <Button type='submit' w={'150px'} h={'40px'} mr={5} backgroundColor={'green.700'} _hover={{ bgColor: 'green.400' }}>Logar</Button>
+              <Button type='submit' w={'150px'} h={'40px'} mr={5} backgroundColor={'green.700'} _hover={{ bgColor: 'green.400' }}>Login</Button>
               <Button onClick={handleClick}>Cadastrar</Button>
             </Flex>
           </form>

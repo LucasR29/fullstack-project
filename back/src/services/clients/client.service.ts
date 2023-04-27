@@ -2,7 +2,7 @@ import { hashSync } from "bcryptjs";
 import { AppDataSource } from "../../data-source";
 import Client from "../../entities/client.entity";
 import { AppError } from "../../errors/appError";
-import { IClientCreationRequest, IClientCreationResponse } from "../../interfaces/clients.interface";
+import { IClientCreationRequest, IClientCreationResponse, IClientEdit } from "../../interfaces/clients.interface";
 import { clientResSchema } from "../../schemas/clientsSchemas/createCliente.schema";
 
 export const createClientService = async (clientData: IClientCreationRequest): Promise<IClientCreationResponse> => {
@@ -11,8 +11,6 @@ export const createClientService = async (clientData: IClientCreationRequest): P
     const exists = await clientRepository.exist({
         where: { email: clientData.email }
     })
-
-
 
     const client = clientRepository.create(clientData)
 
@@ -47,7 +45,7 @@ export const retrieveClientService = async (clientID: string): Promise<any> => {
     return [200, clients]
 }
 
-export const updateClientService = async (clientData: IClientCreationRequest, clientID: string): Promise<any> => {
+export const updateClientService = async (clientData: IClientEdit, clientID: string): Promise<any> => {
     const clientRepository = AppDataSource.getRepository(Client)
 
     const client = await clientRepository.findOne({
@@ -55,6 +53,27 @@ export const updateClientService = async (clientData: IClientCreationRequest, cl
             id: clientID
         }
     })
+
+    if (clientData.full_name?.length === 0) {
+        delete clientData['full_name']
+    }
+
+    if (clientData.email?.length === 0) {
+        delete clientData['email']
+    } else {
+        const validate = await clientRepository.findOneBy({
+            email: clientData.email!
+        })
+
+        if (validate) {
+            return [409, { message: "email already in use" }]
+        }
+    }
+
+    if (clientData.phone_number?.length === 0) {
+        delete clientData['phone_number']
+    }
+
 
     if (!client) {
         return [404, { message: "client not found" }]
@@ -80,7 +99,7 @@ export const listClientService = async (): Promise<IClientCreationRequest[]> => 
 export const deleteClientService = async (clientID: string): Promise<any> => {
     const clientRepository = AppDataSource.getRepository(Client)
 
-    const client = clientRepository.findOne({
+    const client = await clientRepository.findOne({
         where: {
             id: clientID
         }
@@ -90,7 +109,7 @@ export const deleteClientService = async (clientID: string): Promise<any> => {
         return [404, { message: "client not found" }]
     }
 
-    clientRepository.delete({ id: clientID })
+    await clientRepository.delete({ id: clientID })
 
     return [204]
 }
