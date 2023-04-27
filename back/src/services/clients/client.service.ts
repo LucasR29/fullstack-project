@@ -54,6 +54,10 @@ export const updateClientService = async (clientData: IClientEdit, clientID: str
         }
     })
 
+    if (!client) {
+        return [404, { message: "client not found" }]
+    }
+
     if (clientData.full_name?.length === 0) {
         delete clientData['full_name']
     }
@@ -70,13 +74,14 @@ export const updateClientService = async (clientData: IClientEdit, clientID: str
         }
     }
 
-    if (clientData.phone_number?.length === 0) {
-        delete clientData['phone_number']
+    if (clientData.password?.length === 0) {
+        delete clientData['password']
     }
 
-
-    if (!client) {
-        return [404, { message: "client not found" }]
+    if (clientData.phone_number?.length === 0) {
+        delete clientData['phone_number']
+    } else {
+        clientData.password = hashSync(clientData.password!, 10)
     }
 
     const attClient = await clientRepository.save({ id: clientID, ...clientData })
