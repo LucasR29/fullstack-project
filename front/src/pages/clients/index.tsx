@@ -39,7 +39,7 @@ function Clients() {
     const [isDel, setIsDel] = useState(false)
     const [userID, setUserID] = useState('')
     const [isEdit, setIsEdit] = useState(false)
-    const [user, setUser] = useState<{ id: string, full_name: string, phone_number: string }>()
+    const [user, setUser] = useState<{ id: string, full_name: string, phone_number: string, email: string }>()
     const [contacts, setContacts] = useState<any[]>([])
     const { register, handleSubmit, reset, formState: { errors } } = useForm()
 
@@ -236,22 +236,56 @@ function Clients() {
                             </>
                         ) : (
                             <>
-                                <ModalHeader>Contact Info</ModalHeader>
+                                {
+                                    userID === user?.id ?
+                                        (
+                                            <ModalHeader>Edit your info</ModalHeader>
+                                        )
+                                        :
+                                        (
+                                            <ModalHeader>Contact Info</ModalHeader>
+                                        )
+                                }
                                 <ModalCloseButton onClick={event => { setIsClient(false), reset() }} />
                                 <ModalBody>
                                     {
                                         isEdit ? (
                                             <FormControl >
-                                                <FormLabel htmlFor="fullName" marginTop={3}>Full Name</FormLabel>
-                                                <Input id="fullName" {...register("full_name", { required: false })} />
+                                                {
+                                                    userID === user?.id ? (
+                                                        <>
+                                                            <FormLabel htmlFor="fullName" marginTop={3}>Full Name</FormLabel>
+                                                            <Input value={user.full_name} id="fullName" {...register("full_name", { required: false })} />
 
-                                                <FormLabel htmlFor="email" marginTop={3}>Email</FormLabel>
-                                                <Input id="email" type={"email"} {...register("email", { required: false })} />
+                                                            <FormLabel htmlFor="email" marginTop={3}>Email</FormLabel>
+                                                            <Input placeholder="New Email" id="email" type={"email"} {...register("email", { required: false })} />
 
-                                                <FormLabel htmlFor="tel" marginTop={3}>Phone Number</FormLabel>
-                                                <Input id="tel" type="number" {...register("phone_number", { required: false, minLength: 9, maxLength: 15 })} />
-                                                {errors.phone_number?.type === 'minLength' && <Text fontSize={10} color={'red.400'}>Min Length is 9</Text>}
-                                                {errors.phone_number?.type === 'maxLength' && <Text fontSize={10} color={'red.400'}>Max Length is 15</Text>}
+                                                            <FormLabel htmlFor="tel" marginTop={3}>Phone Number</FormLabel>
+                                                            <Input value={user.phone_number} id="tel" type="number" {...register("phone_number", { required: false, minLength: 9, maxLength: 15 })} />
+                                                            {errors.phone_number?.type === 'minLength' && <Text fontSize={10} color={'red.400'}>Min Length is 9</Text>}
+                                                            {errors.phone_number?.type === 'maxLength' && <Text fontSize={10} color={'red.400'}>Max Length is 15</Text>}
+
+                                                            <FormLabel htmlFor="tel" marginTop={3}>Password</FormLabel>
+                                                            <Input placeholder="New password" type="password" {...register("password", { required: false, minLength: 9 })} />
+                                                            {errors.password?.type === 'minLength' && <Text fontSize={10} color={'red.400'}>Min Length is 9</Text>}
+                                                        </>
+
+                                                    ) : (
+                                                        <>
+                                                            <FormLabel htmlFor="fullName" marginTop={3}>Full Name</FormLabel>
+                                                            <Input id="fullName" {...register("full_name", { required: false })} />
+
+                                                            <FormLabel htmlFor="email" marginTop={3}>Email</FormLabel>
+                                                            <Input id="email" type={"email"} {...register("email", { required: false })} />
+
+                                                            <FormLabel htmlFor="tel" marginTop={3}>Phone Number</FormLabel>
+                                                            <Input id="tel" type="number" {...register("phone_number", { required: false, minLength: 9, maxLength: 15 })} />
+                                                            {errors.phone_number?.type === 'minLength' && <Text fontSize={10} color={'red.400'}>Min Length is 9</Text>}
+                                                            {errors.phone_number?.type === 'maxLength' && <Text fontSize={10} color={'red.400'}>Max Length is 15</Text>}
+                                                        </>
+                                                    )
+                                                }
+
                                             </FormControl>
                                         ) : (
                                             <FormControl >
